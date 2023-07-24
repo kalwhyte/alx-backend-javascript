@@ -1,12 +1,16 @@
 # 0x00. ES6 Basics
 
 `JavaScript` `ES6`
-
- ```By: Johann Kerbrat, Engineering Manager at Uber Works```
- ```Weight: 1```
- ```Project will start Jul 24, 2023 6:00 AM, must end by Jul 25, 2023 6:00 AM```
- ```Checker was released at Jul 24, 2023 12:00 PM```
- ```An auto review will be launched at the deadline```
+<br>
+```By: Johann Kerbrat, Engineering Manager at Uber Works```
+<br>
+```Weight: 1```
+<br>
+```Project will start Jul 24, 2023 6:00 AM, must end by Jul 25, 2023 6:00 AM```
+<br>
+```Checker was released at Jul 24, 2023 12:00 PM```
+<br>
+```An auto review will be launched at the deadline```
 
 ## Concepts
 **For this project, we expect you to look at these concepts:**
