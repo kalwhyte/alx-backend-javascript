@@ -6,35 +6,30 @@ export default async function handleProfileSignup(
   lastName,
   fileName,
 ) {
-  const userPromise = signUpUser(firstName, lastName);
-  const photoPromise = uploadPhoto(fileName);
-
   try {
     const [userResponse, photoResponse] = await Promise.allSettled([
-      userPromise,
-      photoPromise,
+      signUpUser(firstName, lastName),
+      uploadPhoto(fileName),
     ]);
 
-    const queue = [
+    return [
       {
-        status: userResult.status,
+        status: userResponse.status,
         value:
-          userResult.status === 'fulfilled'
-            ? userResult.value
-            : userResult.reason,
+          userResponse.status === 'fulfilled'
+            ? userResponse.value
+            : userResponse.reason,
       },
       {
-        status: photoResult.status,
+        status: photoResponse.status,
         value:
-          photoResult.status === 'fulfilled'
-            ? photoResult.value
-            : photoResult.reason,
+          photoResponse.status === 'fulfilled'
+            ? photoResponse.value
+            : photoResponse.reason,
       },
     ];
-
-    return queue;
-  } catch (error) {
-    console.log('Signup system offline');
+  } catch (err) {
+    console.log('Error in handleProfileSignup:', err);
     return [];
   }
 }
