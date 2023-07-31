@@ -1,13 +1,13 @@
-export default function cleanSet(set, startString) {
-  if (typeof set !== 'object' || typeof startString !== 'string') {
-    return '';
-  }
-  const start = startString.length;
-  const result = [];
-  set.forEach((element) => {
-    if (element.startsWith(startString)) {
-      result.push(element.slice(start));
+/* eslint-disable prefer-template */
+function cleanSet(set, startString) {
+  let result = '';
+
+  set.forEach((value) => {
+    if (value.startsWith(startString)) {
+      result += value.slice(startString.length) + '-';
     }
   });
-  return result.join('-');
+  return result.slice(0, -1);
 }
+
+export default cleanSet;
