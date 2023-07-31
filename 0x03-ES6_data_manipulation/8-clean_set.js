@@ -1,13 +1,5 @@
-/* eslint-disable prefer-template */
-function cleanSet(set, startString) {
-  let result = '';
-
-  set.forEach((value) => {
-    if (value.startsWith(startString)) {
-      result += value.slice(startString.length) + '-';
-    }
-  });
-  return result.slice(0, -1);
+export default function cleanSet(set) {
+  if (!set || !(set instanceof Set)) return '';
+  const str = [...set].map((x) => x.replace(/^bon/, '')).join('-');
+  return str;
 }
-
-export default cleanSet;
