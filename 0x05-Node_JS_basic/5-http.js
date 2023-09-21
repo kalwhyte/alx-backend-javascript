@@ -1,19 +1,19 @@
 const http = require('http');
 const fs = require('fs');
 
-const hostname = 'localhost';
-const port = 1245;
+const PORT = 1245;
+const HOSTNAME = 'localhost';
 const app = http.createServer();
 const DB_FILE = process.argv.length > 2 ? process.argv[2] : '';
 
 /**
- * Counting students.
- * @param {string} path.
+ * Counts the students in a CSV data file.
+ * @param {String} path The path to the CSV data file.
  */
 const countStudents = (path) =>
   new Promise((resolve, reject) => {
-    if (!fs.existsSync(path)) {
-      reject(Error('Cannot load the database'));
+    if (!path) {
+      reject(new Error('Cannot load the database'));
     }
     if (path) {
       fs.readFile(path, (err, data) => {
@@ -24,14 +24,15 @@ const countStudents = (path) =>
           const reportParts = [];
           const fileLines = data.toString('utf-8').trim().split('\n');
           const studentGroups = {};
-          const dbFieldNames = fileLines.shift().split(',');
+          const dbFieldNames = fileLines[0].split(',');
           const studentPropNames = dbFieldNames.slice(
             0,
             dbFieldNames.length - 1,
           );
+
           for (const line of fileLines.slice(1)) {
             const studentRecord = line.split(',');
-            const studentPropValue = studentRecord.slice(
+            const studentPropValues = studentRecord.slice(
               0,
               studentRecord.length - 1,
             );
@@ -41,7 +42,7 @@ const countStudents = (path) =>
             }
             const studentEntries = studentPropNames.map((propName, idx) => [
               propName,
-              studentPropValue[idx],
+              studentPropValues[idx],
             ]);
             studentGroups[field].push(Object.fromEntries(studentEntries));
           }
@@ -51,11 +52,12 @@ const countStudents = (path) =>
           );
           reportParts.push(`Number of students: ${totalStudents}`);
           for (const [field, group] of Object.entries(studentGroups)) {
-            const studentNames = group
-              .map((student) => student.firstname)
-              .join(', ');
             reportParts.push(
-              `Number of students in ${field}: ${group.length}. List: ${studentNames}`,
+              [
+                `Number of students in ${field}: ${group.length}.`,
+                'List:',
+                group.map((student) => student.firstname).join(', '),
+              ].join(' '),
             );
           }
           resolve(reportParts.join('\n'));
@@ -64,7 +66,7 @@ const countStudents = (path) =>
     }
   });
 
-const SERVER_ROUTE_HANDLER = [
+const SERVER_ROUTE_HANDLERS = [
   {
     route: '/',
     handler(_, res) {
@@ -80,6 +82,7 @@ const SERVER_ROUTE_HANDLER = [
     route: '/students',
     handler(_, res) {
       const responseParts = ['This is the list of our students'];
+      // console.log('DB_FILE:', DB_FILE);
 
       countStudents(DB_FILE)
         .then((report) => {
@@ -97,7 +100,7 @@ const SERVER_ROUTE_HANDLER = [
           const responseText = responseParts.join('\n');
           res.setHeader('Content-Type', 'text/plain');
           res.setHeader('Content-Length', responseText.length);
-          res.statusCode = 500;
+          res.statusCode = 200;
           res.write(Buffer.from(responseText));
         });
     },
@@ -105,16 +108,16 @@ const SERVER_ROUTE_HANDLER = [
 ];
 
 app.on('request', (req, res) => {
-  for (const { routeHandler } of SERVER_ROUTE_HANDLER) {
-    if (SERVER_ROUTE_HANDLER.route === req.url) {
+  for (const routeHandler of SERVER_ROUTE_HANDLERS) {
+    if (routeHandler.route === req.url) {
       routeHandler.handler(req, res);
       break;
     }
   }
 });
 
-app.listen(port, hostname, () => {
-  process.stdout.write(`Server running at http://${hostname}:${port}/\n`);
+app.listen(PORT, HOSTNAME, () => {
+  process.stdout.write(`Server listening at -> http://${HOSTNAME}:${PORT}\n`);
 });
 
 module.exports = app;
